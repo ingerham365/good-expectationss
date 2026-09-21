@@ -1,0 +1,13 @@
+{
+  "name": "good-expectations",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Good Expectations — static marketing site, deployed on Cloudflare Pages.",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy . --project-name=good-expectations"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}

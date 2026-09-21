@@ -1,0 +1,3 @@
+# Clean-URL convenience redirects (static .html files, no build step)
+/home   /   301
+/index  /   301
