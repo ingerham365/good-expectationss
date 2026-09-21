@@ -376,4 +376,59 @@
         .finally(function () { if (submitBtn) submitBtn.disabled = false; });
     });
   });
+
+  /* ---------- Live AI feed (Signals section) ---------- */
+  var aiFeed = document.querySelector("[data-ai-feed]");
+  if (aiFeed) {
+    var feedStatus = aiFeed.querySelector("[data-ai-feed-status]");
+    var feedList = aiFeed.querySelector("[data-ai-feed-list]");
+
+    function timeAgo(iso) {
+      if (!iso) return "";
+      var diffMs = Date.now() - new Date(iso).getTime();
+      var mins = Math.round(diffMs / 60000);
+      if (mins < 1) return "just now";
+      if (mins < 60) return mins + "m ago";
+      var hours = Math.round(mins / 60);
+      if (hours < 24) return hours + "h ago";
+      var days = Math.round(hours / 24);
+      return days + "d ago";
+    }
+
+    fetch("/api/ai-feed")
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (!data || !data.ok || !data.items || !data.items.length) {
+          if (feedStatus) feedStatus.textContent = "Live feed is temporarily unavailable — check back shortly.";
+          return;
+        }
+        data.items.forEach(function (item) {
+          var li = document.createElement("li");
+          li.className = "ai-feed-item";
+
+          var link = document.createElement("a");
+          link.href = item.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = item.title;
+          li.appendChild(link);
+
+          var meta = document.createElement("span");
+          meta.className = "ai-feed-meta";
+          var bits = [];
+          if (item.source) bits.push(item.source);
+          var ago = timeAgo(item.pubDate);
+          if (ago) bits.push(ago);
+          meta.textContent = bits.join(" · ");
+          li.appendChild(meta);
+
+          feedList.appendChild(li);
+        });
+        if (feedStatus) feedStatus.setAttribute("hidden", "");
+        feedList.removeAttribute("hidden");
+      })
+      .catch(function () {
+        if (feedStatus) feedStatus.textContent = "Live feed is temporarily unavailable — check back shortly.";
+      });
+  }
 })();
